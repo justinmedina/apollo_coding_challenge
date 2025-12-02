@@ -16,6 +16,7 @@ engine = create_engine(
 )
 
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base.metadata.drop_all(bind=engine)
 Base.metadata.create_all(bind=engine)
 
 def override_get_db():
@@ -24,4 +25,57 @@ def override_get_db():
         yield db
     finally:
         db.close()
+
+app.dependency_overrides[get_db] = override_get_db
+
+client = TestClient(app)
+
+# TEST 1: POST/Create Vehicle
+
+def test_create_vehicle():
+    response = client.post("/vehicle", json={
+        "vin": "abc123",
+        "manufacturer": "Honda",
+        "description": "A solid car",
+        "horse_power": 200,
+        "model_name": "Civic",
+        "model_year": 2020,
+        "purchase_price": 20000.00,
+        "fuel_type": "Gas"
+    })
+
+    assert response.status_code == 201
+    data = response.json()
+    assert data["vin"] == "ABC123"
+    assert data["manufacturer"] == "Honda"
+
+# TEST 2: Creating duplicate vehicle
+
+def test_create_duplicate_vehicle():
+
+    client.post("/vehicle", json={
+        "vin": "dup001",
+        "manufacturer": "Honda",
+        "description": "First entry",
+        "horse_power": 150,
+        "model_name": "Civic",
+        "model_year": 2020,
+        "purchase_price": 18000,
+        "fuel_type": "Gas"
+    })
+
+    # Create again with same VIN
+    duplicate = client.post("/vehicle", json={
+        "vin": "dup001",
+        "manufacturer": "Honda",
+        "description": "Duplicate",
+        "horse_power": 160,
+        "model_name": "Civic",
+        "model_year": 2021,
+        "purchase_price": 19000,
+        "fuel_type": "Gas"
+    })
+
+    assert duplicate.status_code == 400
+    assert duplicate.json()["detail"] == "Vehicle with this VIN already exists"
 
