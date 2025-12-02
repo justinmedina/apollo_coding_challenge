@@ -22,15 +22,15 @@ def get_db():
 # create vehicle
 @app.post("/vehicle", response_model=schemas.VehicleResponse, status_code=201)
 def create_vehicle(vehicle: schemas.VehicleCreate, db: Session = Depends(get_db)):
-    existing_vehicle = services.getVehicle(db, vehicle.vin)
+    existing_vehicle = services.get_vehicle(db, vehicle.vin)
     if existing_vehicle:
         raise HTTPException(status_code=400, detail="Vehicle with this VIN already exists")
-    return services.createVehicle(db, vehicle)
+    return services.create_vehicle(db, vehicle)
 
 # get a vehicle by vin
 @app.get("/vehicle/{vin}", response_model=schemas.VehicleResponse, status_code=200)
 def get_vehicle(vin: str, db: Session = Depends(get_db)):
-    vehicle = services.getVehicle(db, vin)
+    vehicle = services.get_vehicle(db, vin)
     if not vehicle:
         raise HTTPException(status_code=404, detail="Vehicle not found")
     return vehicle
@@ -47,6 +47,14 @@ def update_vehicle(vin: str, vehicle: schemas.VehicleCreate, db:Session = Depend
     if not updated_vehicle:
         raise HTTPException(status_code=404, detail="Vehicle not found")
     return updated_vehicle
+
+@app.delete("/vehicle/{vin}",status_code=204)
+def delete_vehicle(vin:str, db: Session = Depends(get_db)):
+    deleted_vehicle = services.delete_vehicle(db, vin)
+    if not deleted_vehicle: 
+        raise HTTPException(status_code=404,detail="Vehicle not found")
+    
+    return deleted_vehicle
 
 
 

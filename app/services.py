@@ -9,7 +9,7 @@ from . import models, schemas
 
 # Create a vehicle
 # pydantic -> sql alchemy 
-def createVehicle(db:Session, vehicle_data: schemas.VehicleCreate):
+def create_vehicle(db:Session, vehicle_data: schemas.VehicleCreate):
     vehicle = models.Vehicle(
         vin=vehicle_data.vin,
         manufacturer=vehicle_data.manufacturer,
@@ -27,7 +27,7 @@ def createVehicle(db:Session, vehicle_data: schemas.VehicleCreate):
 
 
 # get a vehicle by VIN
-def getVehicle(db:Session, vin:str):
+def get_vehicle(db:Session, vin:str):
     vehicle = db.query(models.Vehicle).filter(models.Vehicle.vin == vin).first()
     return vehicle
 
@@ -52,4 +52,14 @@ def update_vehicle(db: Session, vin: str, vehicle_data: schemas.VehicleCreate):
     db.add(vehicle)
     db.commit()
     db.refresh(vehicle)
+    return vehicle
+
+# delete a vehicle
+def delete_vehicle(db: Session, vin: str):
+    vehicle = db.query(models.Vehicle).filter(models.Vehicle.vin == vin).first()
+    if not vehicle:
+        return None
+    db.delete(vehicle)
+    db.commit()
+
     return vehicle
