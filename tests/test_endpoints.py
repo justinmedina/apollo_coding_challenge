@@ -30,6 +30,8 @@ app.dependency_overrides[get_db] = override_get_db
 
 client = TestClient(app)
 
+
+
 # TEST 1: POST/Create Vehicle
 
 def test_create_vehicle():
@@ -48,8 +50,6 @@ def test_create_vehicle():
     data = response.json()
     assert data["vin"] == "ABC123"
     assert data["manufacturer"] == "Honda"
-
-# TEST 2: Creating duplicate vehicle
 
 def test_create_duplicate_vehicle():
 
@@ -78,4 +78,25 @@ def test_create_duplicate_vehicle():
 
     assert duplicate.status_code == 400
     assert duplicate.json()["detail"] == "Vehicle with this VIN already exists"
+
+def test_create_vehicle_invalid_field_type():
+    # horse_power is invalid type (string) = 422
+    response = client.post("/vehicle", json={
+        "vin": "BADTYPE",
+        "manufacturer": "Honda",
+        "description": "Bad HP",
+        "horse_power": "not_a_number",
+        "model_name": "Civic",
+        "model_year": 2020,
+        "purchase_price": 20000,
+        "fuel_type": "Gas"
+    })
+
+    assert response.status_code == 422
+
+def test_create_vehicle_invalid_json():
+    # invalid JSON returns 400
+    response = client.post("/vehicle", data="NOT_JSON")
+    assert response.status_code == 400
+
 
