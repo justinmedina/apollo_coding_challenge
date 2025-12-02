@@ -30,3 +30,7 @@ def createVehicle(db:Session, vehicle_data: schemas.VehicleCreate):
 def getVehicle(db:Session, vin:str):
     vehicle = db.query(models.Vehicle).filter(models.Vehicle.vin == vin).first()
     return vehicle
+
+# get all vehicles 
+def get_all_vehicles(db:Session):
+    return db.query(models.Vehicle).all()

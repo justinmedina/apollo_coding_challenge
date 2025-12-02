@@ -27,10 +27,19 @@ def create_vehicle(vehicle: schemas.VehicleCreate, db: Session = Depends(get_db)
         raise HTTPException(status_code=400, detail="Vehicle with this VIN already exists")
     return services.createVehicle(db, vehicle)
 
-# get a vehicle
+# get a vehicle by vin
 @app.get("/vehicle/{vin}", response_model=schemas.VehicleResponse, status_code=200)
 def get_vehicle(vin: str, db: Session = Depends(get_db)):
     vehicle = services.getVehicle(db, vin)
     if not vehicle:
         raise HTTPException(status_code=404, detail="Vehicle not found")
     return vehicle
+
+# get a list of all vehicles
+@app.get("/vehicle",response_model=list[schemas.VehicleResponse], status_code=200)
+def get_all_vehicles(db: Session = Depends(get_db)):
+    return services.get_all_vehicles(db)
+
+
+
+
