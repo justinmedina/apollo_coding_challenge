@@ -28,7 +28,7 @@ def create_vehicle(db:Session, vehicle_data: schemas.VehicleCreate):
 
 # get a vehicle by VIN
 def get_vehicle(db:Session, vin:str):
-    vehicle = db.query(models.Vehicle).filter(models.Vehicle.vin == vin).first()
+    vehicle = db.query(models.Vehicle).filter(models.Vehicle.vin == vin.upper()).first()
     return vehicle
 
 # get all vehicles 
@@ -37,7 +37,7 @@ def get_all_vehicles(db:Session):
 
 # update a vehicle
 def update_vehicle(db: Session, vin: str, vehicle_data: schemas.VehicleCreate):
-    vehicle = db.query(models.Vehicle).filter(models.Vehicle.vin == vin).first()
+    vehicle = db.query(models.Vehicle).filter(models.Vehicle.vin == vin.upper()).first()
     if not vehicle:
         return None
     
@@ -49,17 +49,16 @@ def update_vehicle(db: Session, vin: str, vehicle_data: schemas.VehicleCreate):
     vehicle.purchase_price = vehicle_data.purchase_price
     vehicle.fuel_type = vehicle_data.fuel_type
 
-    db.add(vehicle)
     db.commit()
     db.refresh(vehicle)
     return vehicle
 
 # delete a vehicle
 def delete_vehicle(db: Session, vin: str):
-    vehicle = db.query(models.Vehicle).filter(models.Vehicle.vin == vin).first()
+    vehicle = db.query(models.Vehicle).filter(models.Vehicle.vin == vin.upper()).first()
     if not vehicle:
         return None
     db.delete(vehicle)
     db.commit()
 
-    return vehicle
+    return True
