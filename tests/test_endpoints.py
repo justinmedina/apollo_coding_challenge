@@ -31,8 +31,9 @@ app.dependency_overrides[get_db] = override_get_db
 client = TestClient(app)
 
 
-
+# ============================================
 # TEST 1: POST/Create Vehicle
+# ============================================
 
 def test_create_vehicle():
     response = client.post("/vehicle", json={
@@ -100,9 +101,10 @@ def test_create_vehicle_invalid_json():
     assert response.status_code == 422
 
 
-
+# ============================================
 # GET /vehicle/{vin} — GET VEHICLE BY VIN
-    
+# ============================================
+  
 def test_get_vehicle_success():
     client.post("/vehicle", json={
         "vin": "get123",
@@ -126,10 +128,61 @@ def test_get_vehicle_not_found():
     assert response.json()["detail"] == "Vehicle not found"
 
 
-
+# ============================================
 # GET /vehicle — GET ALL VEHICLES
-    
+# ============================================
+
 def test_get_all_vehicles():
     response = client.get("/vehicle")
     assert response.status_code == 200
     assert isinstance(response.json(), list)
+
+
+# ============================================
+# PUT /vehicle/{vin} — UPDATE VEHICLE
+# ============================================
+    
+def test_update_vehicle_success():
+    # first Create 
+    client.post("/vehicle", json={
+        "vin": "upd123",
+        "manufacturer": "Ford",
+        "description": "Old desc",
+        "horse_power": 120,
+        "model_name": "Focus",
+        "model_year": 2018,
+        "purchase_price": 10000,
+        "fuel_type": "Gas"
+    })
+
+    # now Update
+    response = client.put("/vehicle/upd123", json={
+        "vin": "upd123",
+        "manufacturer": "Ford",
+        "description": "Updated desc",
+        "horse_power": 140,
+        "model_name": "Focus SE",
+        "model_year": 2019,
+        "purchase_price": 11000,
+        "fuel_type": "Gas"
+    })
+
+    assert response.status_code == 200
+    assert response.json()["description"] == "Updated desc"
+    assert response.json()["horse_power"] == 140
+
+
+def test_update_vehicle_not_found():
+    response = client.put("/vehicle/NONE999", json={
+        "vin": "NONE999",
+        "manufacturer": "boo",
+        "description": "blah",
+        "horse_power": 100,
+        "model_name": "NA",
+        "model_year": 2020,
+        "purchase_price": 10000,
+        "fuel_type": "welp"
+    })
+
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Vehicle not found"
