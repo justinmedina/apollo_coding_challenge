@@ -127,3 +127,9 @@ def test_get_vehicle_not_found():
 
 
 
+# GET /vehicle — GET ALL VEHICLES
+    
+def test_get_all_vehicles():
+    response = client.get("/vehicle")
+    assert response.status_code == 200
+    assert isinstance(response.json(), list)
