@@ -97,6 +97,33 @@ def test_create_vehicle_invalid_field_type():
 def test_create_vehicle_invalid_json():
     # invalid JSON returns 400
     response = client.post("/vehicle", data="NOT_JSON")
-    assert response.status_code == 400
+    assert response.status_code == 422
+
+
+
+# GET /vehicle/{vin} — GET VEHICLE BY VIN
+    
+def test_get_vehicle_success():
+    client.post("/vehicle", json={
+        "vin": "get123",
+        "manufacturer": "Toyota",
+        "description": "car",
+        "horse_power": 150,
+        "model_name": "Corolla",
+        "model_year": 2015,
+        "purchase_price": 15000,
+        "fuel_type": "Gas"
+    })
+
+    response = client.get("/vehicle/get123")
+    assert response.status_code == 200
+    assert response.json()["vin"] == "GET123"
+
+
+def test_get_vehicle_not_found():
+    response = client.get("/vehicle/NOEXIST")
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Vehicle not found"
+
 
 
