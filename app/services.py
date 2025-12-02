@@ -34,3 +34,22 @@ def getVehicle(db:Session, vin:str):
 # get all vehicles 
 def get_all_vehicles(db:Session):
     return db.query(models.Vehicle).all()
+
+# update a vehicle
+def update_vehicle(db: Session, vin: str, vehicle_data: schemas.VehicleCreate):
+    vehicle = db.query(models.Vehicle).filter(models.Vehicle.vin == vin).first()
+    if not vehicle:
+        return None
+    
+    vehicle.manufacturer = vehicle_data.manufacturer
+    vehicle.description = vehicle_data.description
+    vehicle.horse_power = vehicle_data.horse_power
+    vehicle.model_name = vehicle_data.model_name
+    vehicle.model_year = vehicle_data.model_year
+    vehicle.purchase_price = vehicle_data.purchase_price
+    vehicle.fuel_type = vehicle_data.fuel_type
+
+    db.add(vehicle)
+    db.commit()
+    db.refresh(vehicle)
+    return vehicle

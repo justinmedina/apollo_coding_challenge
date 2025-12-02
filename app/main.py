@@ -40,6 +40,15 @@ def get_vehicle(vin: str, db: Session = Depends(get_db)):
 def get_all_vehicles(db: Session = Depends(get_db)):
     return services.get_all_vehicles(db)
 
+# update a vehicle
+@app.put("/vehicle/{vin}", response_model=schemas.VehicleResponse,status_code=200)
+def update_vehicle(vin: str, vehicle: schemas.VehicleCreate, db:Session = Depends(get_db)):
+    updated_vehicle = services.update_vehicle(db, vin, vehicle)
+    if not updated_vehicle:
+        raise HTTPException(status_code=404, detail="Vehicle not found")
+    return updated_vehicle
+
+
 
 
 
