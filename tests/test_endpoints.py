@@ -186,3 +186,32 @@ def test_update_vehicle_not_found():
 
     assert response.status_code == 404
     assert response.json()["detail"] == "Vehicle not found"
+
+# ============================================
+# DELETE /vehicle/{vin} — DELETE VEHICLE
+# ============================================
+def test_delete_vehicle_success():
+    # first create vehicle 
+    client.post("/vehicle", json={
+        "vin": "del123",
+        "manufacturer": "Mazda",
+        "description": "Delete me",
+        "horse_power": 140,
+        "model_name": "Mazda3",
+        "model_year": 2020,
+        "purchase_price": 21000,
+        "fuel_type": "Gas"
+    })
+
+    response = client.delete("/vehicle/del123")
+    assert response.status_code == 204
+
+    # verify that it was deleted
+    response = client.get("/vehicle/del123")
+    assert response.status_code == 404
+
+
+def test_delete_vehicle_not_found():
+    response = client.delete("/vehicle/NOTFOUNDVIN")
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Vehicle not found"
