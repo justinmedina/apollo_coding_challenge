@@ -1,4 +1,4 @@
-# Vehicle Management API — Apollo Engineering Code Challenge
+# Vehicle Management API (Apollo Engineering Code Challenge)
 
 This project implements a Vehicle Management REST API using: FastAPI, SQLite, and SQLAlchemy, and a test suite using pytest.  
 The API supports full CRUD operations on vehicle records and includes validation, error handling, and VIN normalization.
